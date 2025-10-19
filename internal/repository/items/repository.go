@@ -11,6 +11,7 @@ import (
 type Repository interface {
 	Create(ctx context.Context, item *domain.Item) error
 	GetAllItems(ctx context.Context) ([]domain.Item, error)
+	RemoveItem(ctx context.Context, id int) error
 }
 
 type repository struct {
@@ -34,20 +35,36 @@ func (r *repository) Create(ctx context.Context, item *domain.Item) error {
 func (r *repository) GetAllItems(ctx context.Context) ([]domain.Item, error) {
 	var items []domain.Item
 
-	queryStr := "SELECT * FROM items"
-	res, err := r.db.Query(queryStr)
+	queryStr := "SELECT ID, title, description, created_at, price FROM items"
+	rows, err := r.db.Query(queryStr)
 
 	if err != nil {
 		return items, err
 	}
 
-	for res.Next() {
+	defer func() {
+		if err := rows.Close(); err != nil {
+			r.logger.Error("Error while close connecting: ", zap.Error(err))
+			return
+		}
+	}()
+
+	for rows.Next() {
 		var i domain.Item
-		err := res.Scan(&i.ID, &i.Title, &i.Description, &i.CreatedAt, &i.Price)
+		err := rows.Scan(&i.ID, &i.Title, &i.Description, &i.CreatedAt, &i.Price)
 		if err != nil {
 			return items, err
 		}
 		items = append(items, i)
 	}
 	return items, nil
+}
+
+func (r *repository) RemoveItem(ctx context.Context, id int) error {
+	queryStr := "DELETE FROM items WHERE id=$1"
+	if _, err := r.db.Exec(queryStr, id); err != nil {
+		return err
+	}
+
+	return nil
 }

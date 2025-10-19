@@ -2,6 +2,7 @@ package items
 
 import (
 	"context"
+	"errors"
 	"main/internal/domain"
 	"main/internal/repository/items"
 	"main/pkg/app_error"
@@ -12,6 +13,7 @@ import (
 type Service interface {
 	Create(ctx context.Context, item *domain.Item) error
 	GetAllItems(ctx context.Context) ([]domain.Item, error)
+	RemoveItem(ctx context.Context, id int) error
 }
 
 type service struct {
@@ -57,4 +59,17 @@ func (s *service) GetAllItems(ctx context.Context) ([]domain.Item, error) {
 	}
 
 	return res, nil
+}
+
+func (s *service) RemoveItem(ctx context.Context, id int) error {
+	if id == 0 {
+		s.logger.Error("Id can not be zero value")
+		return errors.New("ID is zero value")
+	}
+
+	if err := s.repo.RemoveItem(ctx, id); err != nil {
+		s.logger.Error("Error while removing item: ", zap.Error(err))
+	}
+
+	return nil
 }
