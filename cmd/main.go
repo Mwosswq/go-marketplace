@@ -1,13 +1,12 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"log"
 	itemHandlers "main/internal/handlers/items"
 	itemRepository "main/internal/repository/items"
 	itemServices "main/internal/services/items"
-	responder "main/pkg"
+	"main/pkg/responder"
 	"net/http"
 
 	_ "github.com/lib/pq"
