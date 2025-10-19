@@ -1,12 +1,12 @@
 package items
 
 import (
-	"context"
 	"encoding/json"
 	"main/internal/domain"
 	"main/internal/services/items"
 	responder "main/pkg"
 	"net/http"
+	"strconv"
 
 	"go.uber.org/zap"
 )
@@ -21,35 +21,43 @@ func NewItemsHandler(service items.Service, logger *zap.Logger, responder respon
 	return &Handler{service: service, logger: logger, responder: responder}
 }
 
-func (h *Handler) CreateItem(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func (h *Handler) CreateItem(w http.ResponseWriter, r *http.Request) {
 	var item domain.Item
 
 	if err := json.NewDecoder(r.Body).Decode(&item); err != nil {
 		h.logger.Error("Error decode body: %v", zap.Error(err))
-		return err
+		return
 	}
 
-	if err := h.service.Create(ctx, &item); err != nil {
-		return err
+	if err := h.service.Create(r.Context(), &item); err != nil {
+		return
 	}
 
-	if err := h.responder.Created(w, map[string]string{"message": "Success"}); err != nil {
-		h.logger.Error("Error encode response %v", zap.Error(err))
-		return err
-	}
-
-	return nil
+	h.responder.Created(w, nil)
 }
 
-func (h *Handler) GetAllItems(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	res, err := h.service.GetAllItems(ctx)
+func (h *Handler) GetAllItems(w http.ResponseWriter, r *http.Request) {
+	res, err := h.service.GetAllItems(r.Context())
 	if err != nil {
-		return err
+		h.responder.Error(w, map[string]error{"error": err})
+		return
 	}
 
-	if err := h.responder.OK(w, map[string][]domain.Item{"data": res}); err != nil {
-		h.logger.Error("Response error: ", zap.Error(err))
+	h.responder.OK(w, map[string][]domain.Item{"data": res})
+}
+
+func (h *Handler) RemoveItem(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.PathValue("id"))
+
+	if err != nil {
+		h.responder.Error(w, map[string]error{"error": err})
+		return
 	}
 
-	return nil
+	if err := h.service.RemoveItem(r.Context(), id); err != nil {
+		h.responder.Error(w, map[string]error{"error": err})
+		return
+	}
+
+	h.responder.OK(w, map[string]string{"message": "successfuly removed"})
 }

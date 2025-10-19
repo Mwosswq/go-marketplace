@@ -32,8 +32,7 @@ func main() {
 	defer logger.Sync()
 
 	//utils
-	r := responder.New()
-	ctx := context.Background()
+	r := responder.New(logger)
 
 	//Items
 	itemsRepo := itemRepository.NewItemsRepository(db, logger)
@@ -44,8 +43,10 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/items", func(w http.ResponseWriter, r *http.Request) { itemsHandlers.GetAllItems(ctx, w, r) })
-	mux.HandleFunc("/items/create", func(w http.ResponseWriter, r *http.Request) { itemsHandlers.CreateItem(ctx, w, r) })
+	//items endpoints
+	mux.HandleFunc("/items", itemsHandlers.GetAllItems)
+	mux.HandleFunc("/items/create", itemsHandlers.CreateItem)
+	mux.HandleFunc("/items/{id}/remove", itemsHandlers.RemoveItem)
 
 	logger.Info("Starts server at 8000 port")
 	log.Fatalln(http.ListenAndServe(":8000", mux))
