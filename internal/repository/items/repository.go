@@ -4,8 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"main/internal/domain"
-
-	"go.uber.org/zap"
 )
 
 type Repository interface {
@@ -15,12 +13,11 @@ type Repository interface {
 }
 
 type repository struct {
-	db     *sql.DB
-	logger *zap.Logger
+	db *sql.DB
 }
 
-func NewItemsRepository(db *sql.DB, logger *zap.Logger) Repository {
-	return &repository{db: db, logger: logger}
+func NewItemsRepository(db *sql.DB) Repository {
+	return &repository{db: db}
 }
 
 func (r *repository) Create(ctx context.Context, item *domain.Item) error {
@@ -36,18 +33,13 @@ func (r *repository) GetAllItems(ctx context.Context) ([]domain.Item, error) {
 	var items []domain.Item
 
 	queryStr := "SELECT ID, title, description, created_at, price FROM items"
-	rows, err := r.db.Query(queryStr)
+	rows, err := r.db.QueryContext(ctx, queryStr)
 
 	if err != nil {
 		return items, err
 	}
 
-	defer func() {
-		if err := rows.Close(); err != nil {
-			r.logger.Error("Error while close connecting: ", zap.Error(err))
-			return
-		}
-	}()
+	defer rows.Close()
 
 	for rows.Next() {
 		var i domain.Item
@@ -62,7 +54,7 @@ func (r *repository) GetAllItems(ctx context.Context) ([]domain.Item, error) {
 
 func (r *repository) RemoveItem(ctx context.Context, id int) error {
 	queryStr := "DELETE FROM items WHERE id=$1"
-	_, err := r.db.Exec(queryStr, id)
+	_, err := r.db.ExecContext(ctx, queryStr, id)
 
 	return err
 }
