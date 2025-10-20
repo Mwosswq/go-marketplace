@@ -55,7 +55,7 @@ func (s *service) GetAllItems(ctx context.Context) ([]domain.Item, error) {
 	res, err := s.repo.GetAllItems(ctx)
 	if err != nil {
 		s.logger.Error("Error while getting items list:", zap.Error(err))
-		return []domain.Item{}, err
+		return nil, err
 	}
 
 	return res, nil
@@ -69,6 +69,7 @@ func (s *service) RemoveItem(ctx context.Context, id int) error {
 
 	if err := s.repo.RemoveItem(ctx, id); err != nil {
 		s.logger.Error("Error while removing item: ", zap.Error(err))
+		return err
 	}
 
 	return nil

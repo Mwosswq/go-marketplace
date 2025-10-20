@@ -57,14 +57,12 @@ func (r *repository) GetAllItems(ctx context.Context) ([]domain.Item, error) {
 		}
 		items = append(items, i)
 	}
-	return items, nil
+	return items, rows.Err()
 }
 
 func (r *repository) RemoveItem(ctx context.Context, id int) error {
 	queryStr := "DELETE FROM items WHERE id=$1"
-	if _, err := r.db.Exec(queryStr, id); err != nil {
-		return err
-	}
+	_, err := r.db.Exec(queryStr, id)
 
-	return nil
+	return err
 }
