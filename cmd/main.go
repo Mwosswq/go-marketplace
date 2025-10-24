@@ -4,8 +4,11 @@ import (
 	"database/sql"
 	"log"
 	itemHandlers "main/internal/handlers/items"
+	//usersHandlers "main/internal/handlers/users"
 	itemRepository "main/internal/repository/items"
+	//usersRepository "main/internal/repository/users"
 	itemServices "main/internal/services/items"
+	//usersServices "main/internal/services/users"
 	"main/pkg/responder"
 	"net/http"
 
@@ -32,11 +35,17 @@ func main() {
 
 	//utils
 	r := responder.New(logger)
+	//v := validator.New(logger)
 
 	//Items
-	itemsRepo := itemRepository.NewItemsRepository(db, logger)
+	itemsRepo := itemRepository.NewItemsRepository(db)
 	itemsServices := itemServices.NewItemService(itemsRepo, logger)
 	itemsHandlers := itemHandlers.NewItemsHandler(itemsServices, logger, r)
+
+	//Users
+	//usersRepo := usersRepository.NewUserRepository(db)
+	//usersServices := usersServices.NewUsersService(usersRepo, logger, v)
+	//usersHandlers := usersHandlers.NewUserHandler(usersServices, r)
 
 	//mux, routes and server
 
@@ -46,6 +55,10 @@ func main() {
 	mux.HandleFunc("/items", itemsHandlers.GetAllItems)
 	mux.HandleFunc("/items/create", itemsHandlers.CreateItem)
 	mux.HandleFunc("/items/{id}/remove", itemsHandlers.RemoveItem)
+
+	//users endpoints
+	//mux.HandleFunc("/auth/register", usersHandlers.RegisterUser)
+	//mux.HandleFunc("/auth/login", usersHandlers.LoginUser)
 
 	logger.Info("Starts server at 8000 port")
 	log.Fatalln(http.ListenAndServe(":8000", mux))

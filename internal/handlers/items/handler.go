@@ -39,7 +39,7 @@ func (h *Handler) CreateItem(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) GetAllItems(w http.ResponseWriter, r *http.Request) {
 	res, err := h.service.GetAllItems(r.Context())
 	if err != nil {
-		h.responder.Error(w, map[string]error{"error": err})
+		h.responder.Error(w, err)
 		return
 	}
 
@@ -50,12 +50,12 @@ func (h *Handler) RemoveItem(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 
 	if err != nil {
-		h.responder.Error(w, map[string]error{"error": err})
+		h.responder.Error(w, err)
 		return
 	}
 
 	if err := h.service.RemoveItem(r.Context(), id); err != nil {
-		h.responder.Error(w, map[string]error{"error": err})
+		h.responder.Error(w, err)
 		return
 	}
 
