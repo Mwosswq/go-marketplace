@@ -4,13 +4,12 @@ import (
 	"database/sql"
 	"log"
 	itemHandlers "main/internal/handlers/items"
-	usersHandlers "main/internal/handlers/users"
+	//usersHandlers "main/internal/handlers/users"
 	itemRepository "main/internal/repository/items"
-	usersRepository "main/internal/repository/users"
+	//usersRepository "main/internal/repository/users"
 	itemServices "main/internal/services/items"
-	usersServices "main/internal/services/users"
+	//usersServices "main/internal/services/users"
 	"main/pkg/responder"
-	"main/pkg/validator"
 	"net/http"
 
 	_ "github.com/lib/pq"
@@ -36,7 +35,7 @@ func main() {
 
 	//utils
 	r := responder.New(logger)
-	v := validator.New(logger)
+	//v := validator.New(logger)
 
 	//Items
 	itemsRepo := itemRepository.NewItemsRepository(db)
@@ -44,9 +43,9 @@ func main() {
 	itemsHandlers := itemHandlers.NewItemsHandler(itemsServices, logger, r)
 
 	//Users
-	usersRepo := usersRepository.NewUserRepository(db)
-	usersServices := usersServices.NewUsersService(usersRepo, logger, v)
-	usersHandlers := usersHandlers.NewUserHandler(usersServices, r)
+	//usersRepo := usersRepository.NewUserRepository(db)
+	//usersServices := usersServices.NewUsersService(usersRepo, logger, v)
+	//usersHandlers := usersHandlers.NewUserHandler(usersServices, r)
 
 	//mux, routes and server
 
@@ -58,8 +57,8 @@ func main() {
 	mux.HandleFunc("/items/{id}/remove", itemsHandlers.RemoveItem)
 
 	//users endpoints
-	mux.HandleFunc("/auth/register", usersHandlers.RegisterUser)
-	mux.HandleFunc("/auth/login", usersHandlers.LoginUser)
+	//mux.HandleFunc("/auth/register", usersHandlers.RegisterUser)
+	//mux.HandleFunc("/auth/login", usersHandlers.LoginUser)
 
 	logger.Info("Starts server at 8000 port")
 	log.Fatalln(http.ListenAndServe(":8000", mux))

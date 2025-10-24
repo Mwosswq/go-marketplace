@@ -22,17 +22,15 @@ func NewItemsRepository(db *sql.DB) Repository {
 
 func (r *repository) Create(ctx context.Context, item *domain.Item) error {
 	queryStr := "INSERT INTO items (title, description, created_at, price) VALUES ($1, $2, $3, $4)"
-	if _, err := r.db.ExecContext(ctx, queryStr, item.Title, item.Description, item.CreatedAt, item.Price); err != nil {
-		return err
-	}
+	_, err := r.db.ExecContext(ctx, queryStr, item.Title, item.Description, item.CreatedAt, item.Price)
 
-	return nil
+	return err
 }
 
 func (r *repository) GetAllItems(ctx context.Context) ([]domain.Item, error) {
 	var items []domain.Item
 
-	queryStr := "SELECT ID, title, description, created_at, price FROM items"
+	queryStr := "SELECT id, title, description, created_at, price FROM items"
 	rows, err := r.db.QueryContext(ctx, queryStr)
 
 	if err != nil {

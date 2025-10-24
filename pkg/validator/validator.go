@@ -10,6 +10,7 @@ import (
 type Validator interface {
 	ValidatePassword(password string) error
 	ValidateEmail(email string) error
+	ValidateLength(field string) error
 }
 
 type validator struct {
@@ -37,5 +38,12 @@ func (v *validator) ValidateEmail(email string) error {
 		return errors.New("email must contain @")
 	}
 
+	return nil
+}
+
+func (v *validator) ValidateLength(field string) error {
+	if len(field) == 0 {
+		return errors.New("field length must be more than 0")
+	}
 	return nil
 }
