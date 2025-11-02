@@ -42,7 +42,6 @@ func (r *repository) GetItem(ctx context.Context, id int32) (domain.Item, error)
 		&item.CreatedAt,
 		&item.Price,
 	)
-
 	if err != nil {
 		return item, err
 	}

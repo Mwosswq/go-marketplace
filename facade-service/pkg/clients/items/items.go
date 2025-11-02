@@ -10,7 +10,6 @@ import (
 
 type Client struct {
 	client pb.ItemServiceClient
-	conn   *grpc.ClientConn
 }
 
 func New(addr string) *Client {
@@ -21,18 +20,13 @@ func New(addr string) *Client {
 
 	c := pb.NewItemServiceClient(conn)
 
-	return &Client{client: c, conn: conn}
-}
-
-func (c *Client) Close() {
-	_ = c.conn.Close()
+	return &Client{client: c}
 }
 
 func (c *Client) GetItem(ctx context.Context, id int32) (*pb.GetItemResponse, error) {
 	item, err := c.client.GetItem(ctx, &pb.GetItemRequest{Id: id})
-
 	if err != nil {
-		return &pb.GetItemResponse{}, err
+		return nil, err
 	}
 
 	return item, nil
@@ -40,9 +34,8 @@ func (c *Client) GetItem(ctx context.Context, id int32) (*pb.GetItemResponse, er
 
 func (c *Client) CreateItem(ctx context.Context, item *pb.CreateItemRequest) (*pb.CreateItemResponse, error) {
 	itemResponse, err := c.client.CreateItem(ctx, item)
-
 	if err != nil {
-		return &pb.CreateItemResponse{}, err
+		return nil, err
 	}
 
 	return itemResponse, nil

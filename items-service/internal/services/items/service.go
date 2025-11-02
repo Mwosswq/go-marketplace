@@ -11,7 +11,7 @@ import (
 
 type Service interface {
 	CreateItem(ctx context.Context, item *domain.Item) (int32, error)
-	GetItem(ctx context.Context, id int32) (domain.Item, error)
+	GetItem(ctx context.Context, id int32) (*domain.Item, error)
 }
 
 type service struct {
@@ -29,7 +29,6 @@ func (s *service) CreateItem(ctx context.Context, item *domain.Item) (int32, err
 	}
 
 	id, err := s.repo.CreateItem(ctx, item)
-
 	if err != nil {
 		return 0, err
 	}
@@ -51,12 +50,12 @@ func (s *service) validateItem(item *domain.Item) error {
 	return nil
 }
 
-func (s *service) GetItem(ctx context.Context, id int32) (domain.Item, error) {
+func (s *service) GetItem(ctx context.Context, id int32) (*domain.Item, error) {
 	res, err := s.repo.GetItem(ctx, id)
 	if err != nil {
 		s.logger.Error("Error while getting items list:", zap.Error(err))
-		return domain.Item{}, err
+		return nil, err
 	}
 
-	return res, nil
+	return &res, nil
 }

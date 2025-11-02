@@ -1,12 +1,13 @@
 package main
 
 import (
-	"database/sql"
 	itemHandlers "items-service/internal/handlers/items"
 	itemRepository "items-service/internal/repository/items"
 	itemServices "items-service/internal/services/items"
-	pb "items-service/proto"
+	"items-service/pkg/postgres"
 	"net"
+
+	pb "github.com/marketplace-go/contracts/items"
 
 	_ "github.com/lib/pq"
 	"go.uber.org/zap"
@@ -20,10 +21,7 @@ func main() {
 
 	//DB
 	connStr := "postgres://postgres:example@db:5432/market?sslmode=disable"
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		logger.Fatal("Error while connecting database: ", zap.Error(err))
-	}
+	db := postgres.New(logger, connStr)
 
 	if err := db.Ping(); err != nil {
 		logger.Fatal("Connection failed: ", zap.Error(err))

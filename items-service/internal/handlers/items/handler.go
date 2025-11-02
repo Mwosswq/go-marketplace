@@ -2,10 +2,14 @@ package items
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"items-service/internal/domain"
 	"items-service/internal/services/items"
 
 	pb "github.com/marketplace-go/contracts/items"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -19,14 +23,13 @@ func NewItemsHandler(service items.Service) *Handler {
 }
 
 func (h *Handler) CreateItem(ctx context.Context, req *pb.CreateItemRequest) (*pb.CreateItemResponse, error) {
-	var item = &domain.Item{
+	item := &domain.Item{
 		Title:       req.GetTitle(),
 		Description: req.GetDescription(),
 		Price:       req.GetPrice(),
 	}
 
 	id, err := h.service.CreateItem(ctx, item)
-
 	if err != nil {
 		return nil, err
 	}
@@ -35,11 +38,9 @@ func (h *Handler) CreateItem(ctx context.Context, req *pb.CreateItemRequest) (*p
 }
 
 func (h *Handler) GetItem(ctx context.Context, req *pb.GetItemRequest) (*pb.GetItemResponse, error) {
-
-	item, err := h.service.GetItem(ctx, req.Id)
-
-	if err != nil {
-		return &pb.GetItemResponse{}, nil
+	item, err := h.service.GetItem(ctx, req.GetId())
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, status.Error(codes.NotFound, "item not found")
 	}
 
 	return &pb.GetItemResponse{
