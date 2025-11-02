@@ -1,6 +1,0 @@
-github.com/marketplace-go/contracts v0.0.0-20251024185104-8df32a604fca h1:5pEzWdW+xYXSn0xGnaw50NbwtiL9o+wS4rvzF0yz8ZM=
-github.com/marketplace-go/contracts v0.0.0-20251024185104-8df32a604fca/go.mod h1:lowlkgigqn6HUTB4y4R+/mdiCfShNGSJTQ6GlMfjJPc=
-go.uber.org/multierr v1.11.0 h1:blXXJkSxSSfBVBlC76pxqeO+LN3aDfLQo+309xJstO0=
-go.uber.org/multierr v1.11.0/go.mod h1:20+QtiLqy0Nd6FdQB9TLXag12DsQkrbs3htMFfDN80Y=
-go.uber.org/zap v1.27.0 h1:aJMhYGrd5QSmlpLMr2MftRKl7t8J8PTZPA732ud/XR8=
-go.uber.org/zap v1.27.0/go.mod h1:GB2qFLM7cTU87MWRP2mPIjqfIDnGu+VIO4V/SdhGo2E=
