@@ -1,0 +1,2 @@
+db_url: postgres://postgres:example@db:5432/market?sslmode=disable
+port: 50051

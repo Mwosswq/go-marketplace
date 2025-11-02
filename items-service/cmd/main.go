@@ -1,6 +1,7 @@
 package main
 
 import (
+	"items-service/config"
 	itemHandlers "items-service/internal/handlers/items"
 	itemRepository "items-service/internal/repository/items"
 	itemServices "items-service/internal/services/items"
@@ -19,8 +20,11 @@ func main() {
 	logger, _ := zap.NewDevelopment()
 	defer logger.Sync()
 
+	//Config
+	cfg := config.Get()
+
 	//DB
-	connStr := "postgres://postgres:example@db:5432/market?sslmode=disable"
+	connStr := cfg.DBurl
 	db := postgres.New(logger, connStr)
 
 	if err := db.Ping(); err != nil {
@@ -34,7 +38,7 @@ func main() {
 	handlers := itemHandlers.NewItemsHandler(services)
 
 	//gRPC server
-	lis, err := net.Listen("tcp", ":50051")
+	lis, err := net.Listen("tcp", ":"+cfg.Port)
 
 	if err != nil {
 		logger.Fatal("failed to listen: ", zap.Error(err))
@@ -43,7 +47,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 	pb.RegisterItemServiceServer(grpcServer, handlers)
 
-	logger.Info("starting gRPC on 50051 port")
+	logger.Info("starting gRPC on ", zap.String("port", cfg.Port))
 
 	if err := grpcServer.Serve(lis); err != nil {
 		logger.Fatal("failed to serve: ", zap.Error(err))
